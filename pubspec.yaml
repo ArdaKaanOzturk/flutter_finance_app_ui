@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_feather_icons: ^2.0.0+1
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:
