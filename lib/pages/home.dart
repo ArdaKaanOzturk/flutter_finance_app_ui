@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
           return const Center(child: Text('No transactions found'));
         } else {
           return ListView.builder(
-            itemCount: snapshot.data!.length + 1,
+            itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               final transaction = snapshot.data![index];
               return 
