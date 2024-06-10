@@ -14,6 +14,8 @@ class Person {
       amount: ((json['id'] * 100).toDouble() * (json['id'] % 2 == 0 ? 1 : -1)),
     );
   }
+
+  String? get imageUrl => null;
 }
 
 Future<List<Person>> fetchPersons() async {

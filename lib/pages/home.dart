@@ -1,3 +1,4 @@
+import 'package:dribble_finance_app_design/pages/send.dart';
 import 'package:flutter/material.dart';
 import 'package:dribble_finance_app_design/theme/colors.dart';
 import 'package:dribble_finance_app_design/models/person.dart';
@@ -79,8 +80,12 @@ class _HomePageState extends State<HomePage> {
                       icon: Icons.send,
                       label: 'Send',
                       onTap: () {
-                        // Handle Send button tap
-                      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SendPage(),
+      ),
+    );
+  },
                     ),
                     _buildActionButton(
                       icon: Icons.request_page,
