@@ -2,7 +2,6 @@ import 'package:dribble_finance_app_design/cubit/send_cubit.dart';
 import 'package:dribble_finance_app_design/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 void main() {
   runApp(const MainApp());
@@ -13,9 +12,11 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MultiBlocProvider(
+    return MultiBlocProvider(
       providers: [
-        BlocProvider<SendCubit>(create: (context) => SendCubit(),)
+        BlocProvider<SendCubit>(
+          create: (context) => SendCubit(),
+        ),
       ],
       child: const MaterialApp(
         home: HomePage(),

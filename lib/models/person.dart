@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
 class Person {
   final String name;
   final double amount;
@@ -18,14 +15,4 @@ class Person {
   String? get imageUrl => null;
 }
 
-Future<List<Person>> fetchPersons() async {
-  final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/users'));
 
-  if (response.statusCode == 200) {
-    List<dynamic> body = json.decode(response.body);
-    List<Person> persons = body.map((dynamic item) => Person.fromJson(item)).toList();
-    return persons;
-  } else {
-    throw Exception('Failed to load persons');
-  }
-}

@@ -1,4 +1,5 @@
-import 'package:dribble_finance_app_design/pages/send.dart';
+import 'package:dribble_finance_app_design/pages/transfer_money/choose_user.dart';
+import 'package:dribble_finance_app_design/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:dribble_finance_app_design/theme/colors.dart';
 import 'package:dribble_finance_app_design/models/person.dart';
@@ -17,8 +18,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    PersonService personService = PersonService();
     super.initState();
-    futurePersons = fetchPersons();
+    futurePersons = personService.fetchPersons();
   }
 
   @override
