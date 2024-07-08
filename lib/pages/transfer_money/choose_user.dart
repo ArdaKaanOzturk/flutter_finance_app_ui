@@ -15,6 +15,16 @@ class SendPage extends StatefulWidget {
 
 class _SendPageState extends State<SendPage> {
   Person? selectedPerson;
+  bool isLoading = true;
+  List<Person>? persons;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<SendCubit>().FetchUsers();
+  }
+
 
   void _handlePersonSelection(BuildContext context, Person person) {
     if (selectedPerson == person) {
@@ -38,6 +48,27 @@ class _SendPageState extends State<SendPage> {
       ),
       body: BlocListener<SendCubit, SendState>(
         listener: (context, state) {
+          if (state is UserFetchLoading) {
+            setState(() {
+              isLoading = true;
+            });
+          }
+
+          if(state is UserFetchFailed){
+            setState(() {
+              isLoading = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMessage)));
+          }
+
+          if(state is UserFetchSuccess){
+            setState(() {
+              persons = state.users;
+              isLoading = false;
+              print(persons);
+            });
+          }
+
           if (state is SendPersonSelected) {
             setState(() {
               selectedPerson = state.person;
@@ -50,68 +81,56 @@ class _SendPageState extends State<SendPage> {
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search receiver',
-                  prefixIcon: Icon(Icons.search),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search receiver',
+                    prefixIcon: Icon(Icons.search),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: FutureBuilder<List<Person>>(
-                  future: PersonService().fetchPersons(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No receivers available'));
-                    } else {
-                      return ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          final person = snapshot.data![index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: NetworkImage(person.imageUrl ?? 'https://via.placeholder.com/150'),
-                                radius: 40,
+                const SizedBox(height: 20),
+                
+                  isLoading ? Center( child: CircularProgressIndicator(),) : ListView.builder(
+
+                        itemCount: persons?.length,
+                        shrinkWrap: false,
+                        itemBuilder: (context, index) {                            
+                          return GestureDetector(
+                            onTap: () => _handlePersonSelection(context, persons?[index]?? Person(name: '', amount: 0)),
+                            child: Container(
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(persons?[index].imageUrl ?? 'https://via.placeholder.com/150'),
+                                  radius: 28,
+                                ),
+                                title: Text(persons? [index].name ?? ''),
+                                selectedTileColor: AppColors.accent,
                               ),
-                              title: Text(person.name),
-                              selected: selectedPerson == person,
-                              selectedTileColor: AppColors.accent,
-                              onTap: () {
-                                _handlePersonSelection(context, person);
-                              },
                             ),
                           );
                         },
-                      );
-                    }
-                  },
-                ),
-              ),
-              ElevatedButton(
-                onPressed: selectedPerson != null
-                    ? () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider.value(
-                              value: context.read<SendCubit>(),
-                              child: EnterAmountPage(person: selectedPerson!),
+                      ),
+                
+                ElevatedButton(
+                  onPressed: selectedPerson != null
+                      ? () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => BlocProvider.value(
+                                value: context.read<SendCubit>(),
+                                child: EnterAmountPage(person: selectedPerson!),
+                              ),
                             ),
-                          ),
-                        );
-                      }
-                    : null,
-                child: const Text('Continue'),
-              ),
-            ],
+                          );
+                        }
+                      : null,
+                  child: const Text('Continue'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

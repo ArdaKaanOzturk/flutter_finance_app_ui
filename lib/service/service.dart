@@ -8,13 +8,10 @@ class PersonService{
   Future<List<Person>> fetchPersons() async {
   final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/users'));
 
-  if (response.statusCode == 200) {
     List<dynamic> body = json.decode(response.body);
     List<Person> persons = body.map((dynamic item) => Person.fromJson(item)).toList();
     return persons;
-  } else {
-    throw Exception('Failed to load persons');
-  }
+  
 }
 
 Future<dynamic> getItemStatus() async{
@@ -22,5 +19,4 @@ Future<dynamic> getItemStatus() async{
   var data = await ApiBaseHelper.instance.get(endPoint);
   return data;
 }
-
 }

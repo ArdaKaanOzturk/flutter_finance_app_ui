@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 class Person {
   final String name;
   final double amount;
@@ -14,5 +17,3 @@ class Person {
 
   String? get imageUrl => null;
 }
-
-

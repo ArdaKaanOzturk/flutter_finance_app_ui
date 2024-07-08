@@ -1,18 +1,15 @@
-
 part of 'send_cubit.dart';
+
 abstract class SendState extends Equatable {
   const SendState();
-  
+
   @override
   List<Object?> get props => [];
-
-  Person? get person => null;
 }
 
 class SendInitial extends SendState {}
 
 class SendPersonSelected extends SendState {
-  @override
   final Person person;
 
   const SendPersonSelected(this.person);
@@ -24,7 +21,6 @@ class SendPersonSelected extends SendState {
 class SendPersonUnselected extends SendState {}
 
 class SendAmountEntered extends SendState {
-  @override
   final Person person;
   final double amount;
 
@@ -34,7 +30,23 @@ class SendAmountEntered extends SendState {
   List<Object> get props => [person, amount];
 }
 
-class AmountLoading extends SendState {
-  @override
-  List<Object> get props => [];
+class AmountLoading extends SendState {}
+
+class UserFetchSuccess extends SendState {
+  final List<Person> users;
+
+  const UserFetchSuccess({required this.users});
 }
+
+class UserFetchFailed extends SendState {
+  final String errorMessage;
+
+ const UserFetchFailed({required this.errorMessage});
+}
+
+class UserFetchLoading extends SendState {
+  const UserFetchLoading();
+}
+
+
+
