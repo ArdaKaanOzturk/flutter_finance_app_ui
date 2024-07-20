@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:dribble_finance_app_design/service/service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:dribble_finance_app_design/models/person.dart';
-import 'package:flutter/material.dart';
 
 part 'send_state.dart';
 
@@ -25,14 +24,14 @@ class SendCubit extends Cubit<SendState> {
     });
   }
 
-  Future<void> FetchUsers() async{
+  // ignore: non_constant_identifier_names
+  Future<void> FetchUsers() async {
     emit(const UserFetchLoading());
     try {
       final users = await personService.fetchPersons();
       emit(UserFetchSuccess(users: users));
     } catch (e) {
-     emit(const UserFetchFailed(errorMessage: 'Bir hata meydana geldi.'));
+      emit(const UserFetchFailed(errorMessage: 'Bir hata meydana geldi.'));
     }
   }
-
 }

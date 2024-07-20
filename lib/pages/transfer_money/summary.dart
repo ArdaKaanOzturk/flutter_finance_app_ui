@@ -1,8 +1,8 @@
 import 'package:dribble_finance_app_design/models/person.dart';
-import 'package:dribble_finance_app_design/cubit/send_cubit.dart';
+import 'package:dribble_finance_app_design/pages/transfer_money/cubit/send_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dribble_finance_app_design/pages/home.dart';
+import 'package:dribble_finance_app_design/pages/home/home.dart';
 
 class SummaryPage extends StatefulWidget {
   final String amount;

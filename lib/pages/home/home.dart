@@ -1,26 +1,26 @@
-import 'package:dribble_finance_app_design/pages/transfer_money/choose_user.dart';
-import 'package:dribble_finance_app_design/service/service.dart';
-import 'package:flutter/material.dart';
-import 'package:dribble_finance_app_design/theme/colors.dart';
 import 'package:dribble_finance_app_design/models/person.dart';
-import 'package:flutter/widgets.dart';
+import 'package:dribble_finance_app_design/pages/home/cubit/home_cubit.dart';
+import 'package:dribble_finance_app_design/pages/transfer_money/choose_user.dart';
+import 'package:dribble_finance_app_design/theme/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _HomePageState createState() => _HomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _HomePageState extends State<HomePage> {
-  late Future<List<Person>> futurePersons;
+class _HomeState extends State<HomePage> {
+  List<Person> futurePersons = [];
+  bool isLoadingHome = true;
+
 
   @override
   void initState() {
-    PersonService personService = PersonService();
     super.initState();
-    futurePersons = personService.fetchPersons();
+    context.read<HomeCubit>().fetchUsers();
   }
 
   @override
@@ -37,7 +37,44 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Padding(
+      body: BlocListener<HomeCubit, HomeState>(
+        listener: (context, state) {
+          if (state is HomeLoading) {
+            setState(() {
+              isLoadingHome = true;
+            });
+            /*
+            // Show a loading indicator
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            );
+            */
+          } else if (state is HomeLoaded) {
+            setState(() {
+              isLoadingHome = false;
+            });
+            /* Navigator.of(context).pop(); // Hide loading indicator */
+            setState(() {
+              futurePersons = state.users;
+            });
+          } else if (state is HomeError) {
+            setState(() {
+              isLoadingHome = false;
+            });
+           /* Navigator.of(context).pop(); // Hide loading indicator */
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Kullanıcılar yüklenirken bir hata meydana geldi. : ${state.errorMessage}')),
+            );
+          }
+
+        },
+        child: Padding(
         padding: const EdgeInsets.all(0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,20 +155,12 @@ class _HomePageState extends State<HomePage> {
         topRight: Radius.circular(25.0), // Sağ üst köşe
       ),
     ),
-    child: FutureBuilder<List<Person>>(
-      future: futurePersons,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Failed to load persons'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No transactions found'));
-        } else {
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
+    child: isLoadingHome ? const Center(child: CircularProgressIndicator()) : 
+
+          ListView.builder(
+            itemCount: futurePersons.length,
             itemBuilder: (context, index) {
-              final transaction = snapshot.data![index];
+              final transaction = futurePersons[index];
               return 
               index == 0 ? 
               Center(
@@ -144,7 +173,7 @@ class _HomePageState extends State<HomePage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (index == 0 || snapshot.data![index - 1].amount.sign != transaction.amount.sign)
+                  if (index == 0 || futurePersons[index - 1].amount.sign != transaction.amount.sign)
                     Text(
                       transaction.amount > 0 ? 'Received' : 'Sent',
                       style: const TextStyle(
@@ -156,14 +185,12 @@ class _HomePageState extends State<HomePage> {
                 ],
               );
             },
-          );
-        }
-      },
-    ),
+          ),
   ),
 ),
           ],
         ),
+      ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -183,7 +210,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
   Widget _buildActionButton({required IconData icon, required String label, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,

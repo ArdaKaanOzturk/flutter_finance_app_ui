@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dribble_finance_app_design/theme/colors.dart';
 import 'package:dribble_finance_app_design/models/person.dart';
-import 'package:dribble_finance_app_design/cubit/send_cubit.dart';
+import 'package:dribble_finance_app_design/pages/transfer_money/cubit/send_cubit.dart';
 
 class SendPage extends StatefulWidget {
   const SendPage({super.key});
@@ -14,19 +14,18 @@ class SendPage extends StatefulWidget {
 }
 
 class _SendPageState extends State<SendPage> {
+  Person? person;
   Person? selectedPerson;
   bool isLoading = true;
   List<Person>? persons;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     context.read<SendCubit>().FetchUsers();
   }
 
-
-  void _handlePersonSelection(BuildContext context, Person person) {
+  void _handlePersonSelection(BuildContext context, person) {
     if (selectedPerson == person) {
       context.read<SendCubit>().unselectPerson();
     } else {
@@ -42,6 +41,9 @@ class _SendPageState extends State<SendPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
+            if(selectedPerson == person){
+              context.read<SendCubit>().unselectPerson();
+            }
             Navigator.of(context).pop();
           },
         ),
@@ -54,18 +56,17 @@ class _SendPageState extends State<SendPage> {
             });
           }
 
-          if(state is UserFetchFailed){
+          if (state is UserFetchFailed) {
             setState(() {
               isLoading = false;
             });
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMessage)));
           }
 
-          if(state is UserFetchSuccess){
+          if (state is UserFetchSuccess) {
             setState(() {
               persons = state.users;
               isLoading = false;
-              print(persons);
             });
           }
 
@@ -80,7 +81,7 @@ class _SendPageState extends State<SendPage> {
           }
         },
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(13.0),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,28 +93,33 @@ class _SendPageState extends State<SendPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                
-                  isLoading ? Center( child: CircularProgressIndicator(),) : ListView.builder(
-
+                isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : ListView.builder(
                         itemCount: persons?.length,
-                        shrinkWrap: false,
-                        itemBuilder: (context, index) {                            
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final person = persons?[index];
+                          final isSelected = selectedPerson == person;
                           return GestureDetector(
-                            onTap: () => _handlePersonSelection(context, persons?[index]?? Person(name: '', amount: 0)),
-                            child: Container(
+                            onTap: () => _handlePersonSelection(context, person ?? Person(name: '', amount: 0)),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 3),
                               child: ListTile(
                                 leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(persons?[index].imageUrl ?? 'https://via.placeholder.com/150'),
+                                  backgroundImage: NetworkImage(person?.imageUrl ?? 'https://via.placeholder.com/150'),
                                   radius: 28,
                                 ),
-                                title: Text(persons? [index].name ?? ''),
+                                title: Text(person?.name ?? ''),
+                                selected: isSelected,
                                 selectedTileColor: AppColors.accent,
                               ),
                             ),
                           );
                         },
                       ),
-                
                 ElevatedButton(
                   onPressed: selectedPerson != null
                       ? () {

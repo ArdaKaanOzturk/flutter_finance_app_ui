@@ -1,5 +1,6 @@
-import 'package:dribble_finance_app_design/cubit/send_cubit.dart';
-import 'package:dribble_finance_app_design/pages/home.dart';
+import 'package:dribble_finance_app_design/pages/home/cubit/home_cubit.dart';
+import 'package:dribble_finance_app_design/pages/transfer_money/cubit/send_cubit.dart';
+import 'package:dribble_finance_app_design/pages/home/home.dart';
 import 'package:dribble_finance_app_design/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +18,9 @@ class MainApp extends StatelessWidget {
       providers: [
         BlocProvider<SendCubit>(
           create: (context) => SendCubit(PersonService()),
+        ),
+        BlocProvider<HomeCubit>(
+          create: (context) => HomeCubit(PersonService()),
         ),
       ],
       child: const MaterialApp(
